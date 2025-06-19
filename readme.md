@@ -34,23 +34,28 @@ Make sure you have the following installed:
 ## Installation
 
 1. Clone the repository:
+
 ```bash
 git clone https://github.com/arek-lab/node-base-auth.git
 cd node-base-auth
 ```
+
 2. Install dependencies
 3. Create a .env file in the root directory and add the following environment variables:
-MONGO_URL=your_mongo_connection_string
-JWT_SECRET=your_jwt_secret
-JWT_LIFETIME=1d
-FRONTEND_ORIGIN=http://localhost:4200
-NODE_MAILER_API_KEY=your_mailgun_api_key
-NODE_MAILER_DOMAIN=your domain
-GOOGLE_CLIENT_ID=your_google_client_id
-GOOGLE_CLIENT_SECRET=your_google_client_secret
+   ```
+   MONGO_URL=your_mongo_connection_string
+   JWT_SECRET=your_jwt_secret
+   JWT_LIFETIME=1d
+   FRONTEND_ORIGIN=http://localhost:4200
+   NODE_MAILER_API_KEY=your_mailgun_api_key
+   NODE_MAILER_DOMAIN=your domain
+   GOOGLE_CLIENT_ID=your_google_client_id
+   GOOGLE_CLIENT_SECRET=your_google_client_secret
+   ```
 
 ## Structure:
-'''
+
+```
 node-base-auth/
 ├── controllers/
 ├── middleware/
@@ -60,7 +65,7 @@ node-base-auth/
 ├── .env.example
 ├── server.js
 └── README.md
-'''
+```
 
 ## License
 
