@@ -6,6 +6,7 @@ Backend authentication server for the [App Base Auth](https://github.com/arek-la
 
 - User registration
 - User login
+- Login with Google Oauth
 - JWT-based authentication
 - Protected routes
 - Basic user role handling
@@ -46,8 +47,8 @@ cd node-base-auth
    MONGO_URL=your_mongo_connection_string
    JWT_SECRET=your_jwt_secret
    JWT_LIFETIME=1d
-   FRONTEND_ORIGIN=http://localhost:4200
-   NODE_MAILER_API_KEY=your_mailgun_api_key
+   FRONTEND_ORIGIN=your frontend domain
+   NODE_MAILER_API_KEY=your mailgun api key
    NODE_MAILER_DOMAIN=your domain
    GOOGLE_CLIENT_ID=your_google_client_id
    GOOGLE_CLIENT_SECRET=your_google_client_secret
