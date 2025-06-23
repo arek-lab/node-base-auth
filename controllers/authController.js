@@ -142,86 +142,85 @@ const refreshToken = async (req, res) => {
   }
 };
 
-///////////////////////////////////////////////////
-///////////////////////////////////////////////////
-///////////////////////////////////////////////////
+const forgotPassword = async (req, res) => {
+  const { email } = req.body;
+  if (!email) {
+    throw new CustomError.BadRequestError('Please provide valid email');
+  }
+  const user = await User.findOne({ email });
+  if (user) {
+    const passwordToken = crypto.randomBytes(70).toString('hex');
 
-// const forgotPassword = async (req, res) => {
-//   const { email } = req.body;
-//   if (!email) {
-//     throw new CustomError.BadRequestError('Please provide valid email');
-//   }
-//   const user = await User.findOne({ email });
-//   if (user) {
-//     const passwordToken = crypto.randomBytes(70).toString('hex');
+    const origin = process.env.FRONTEND_ORIGIN;
+    await sendResetPasswordEmail({
+      name: user.name,
+      email: user.email,
+      token: passwordToken,
+      origin,
+    });
 
-//     const origin = 'http://localhost:3000';
-//     await sendResetPasswordEmail({
-//       name: user.name,
-//       email: user.email,
-//       token: passwordToken,
-//       origin,
-//     });
+    const expTime = 1000 * 60 * 10;
+    const passwordTokenExpirationDate = new Date(Date.now() + expTime);
 
-//     const tenMinutes = 1000 * 60 * 10;
-//     const passwordTokenExpirationDate = new Date(Date.now() + tenMinutes);
+    user.passwordToken = createHash(passwordToken);
+    user.passwordTokenExpirationDate = passwordTokenExpirationDate;
+    await user.save();
+  }
+  res
+    .status(StatusCodes.OK)
+    .json({ msg: 'Please check your email for reset password link' });
+};
 
-//     user.passwordToken = createHash(passwordToken);
-//     user.passwordTokenExpirationDate = passwordTokenExpirationDate;
-//     await user.save();
-//   }
-//   res
-//     .status(StatusCodes.OK)
-//     .json({ msg: 'Please check your email for reset password link' });
-// };
+const resetPassword = async (req, res) => {
+  const { email, token, password } = req.body;
 
-// const resetPassword = async (req, res) => {
-//   const { email, token, password } = req.body;
+  if (!token || !email || !password) {
+    throw new CustomError.BadRequestError('Please provide all values');
+  }
 
-//   if (!token || !email || !password) {
-//     throw new CustomError.BadRequestError('Please provide all values');
-//   }
+  const user = await User.findOne({ email });
 
-//   const user = await User.findOne({ email });
+  if (user) {
+    const currentDate = new Date();
 
-//   if (user) {
-//     const currentDate = new Date();
+    if (
+      user.passwordToken === createHash(token) &&
+      user.passwordTokenExpirationDate > currentDate
+    ) {
+      user.password = password;
+      user.passwordToken = null;
+      user.passwordTokenExpirationDate = null;
+      await user.save();
+    }
+  }
 
-//     if (
-//       user.passwordToken === createHash(token) &&
-//       user.passwordTokenExpirationDate > currentDate
-//     ) {
-//       user.password = password;
-//       user.passwordToken = null;
-//       user.passwordTokenExpirationDate = null;
-//       await user.save();
-//     }
-//   }
+  res.status(StatusCodes.OK).json({
+    msg: 'Password reset successful, you can now login with your new password.',
+  });
+};
 
-//   res.status(StatusCodes.OK).json({});
-// };
+const verifyEmail = async (req, res) => {
+  const { verificationToken, email } = req.body;
+  const user = await User.findOne({ email });
+  if (!user) throw new CustomError.UnauthenticatedError('Verification Failed');
 
-// const verifyEmail = async (req, res) => {
-//   const { verificationToken, email } = req.body;
-//   const user = await User.findOne({ email });
-//   if (!user) throw new CustomError.UnauthenticatedError('Verification Failed');
+  if (user.verificationToken !== verificationToken)
+    throw new CustomError.UnauthenticatedError('Verification Failed');
 
-//   if (user.verificationToken !== verificationToken)
-//     throw new CustomError.UnauthenticatedError('Verification Failed');
-
-//   user.isVerified = true;
-//   user.verified = Date.now();
-//   user.verificationToken = '';
-//   await user.save();
-//   res.status(StatusCodes.OK).json({ msg: 'Email Verified' });
-// };
+  user.isVerified = true;
+  user.verified = Date.now();
+  user.verificationToken = '';
+  await user.save();
+  // res.status(StatusCodes.OK).json({ msg: 'Email Verified' });
+  res.redirect(`${process.env.FRONTEND_ORIGIN}/user/login`);
+};
 
 module.exports = {
   register,
   login,
   logout,
-  // verifyEmail,
-  // forgotPassword,
-  // resetPassword,
+  verifyEmail,
+  forgotPassword,
+  resetPassword,
   refreshToken,
 };

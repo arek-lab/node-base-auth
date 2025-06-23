@@ -6,14 +6,12 @@ const sendVerificationEmail = async ({
   verificationToken,
   origin,
 }) => {
-  // const verifyEmail = `${origin}/user/verify-email?token=${verificationToken}&email=${email}`;
+  const verifyEmail = `${origin}/user/verify-email?token=${verificationToken}&email=${email}`;
 
-  // const message = `<p>Please confirm your email by clicking on teh following link: <a href=${verifyEmail}>Verify Email</a> </p>`;
-
-  const message = `Użytkownik ${email} prosi o dostęp do aplikacji`;
+  const message = `<p>Please confirm your email by clicking on the following link: <a href=${verifyEmail}>Verify Email</a> </p>`;
 
   return sendEmail({
-    to: 'trombopython@gmail.com',
+    to: email,
     subject: 'Email Confirmation',
     html: `<h4>Hello ${name}</h4>
     ${message}`,
